@@ -1,0 +1,10 @@
+/bin/
+/*.exe
+/*.out
+
+.o
+.obj
+
+iso
+build
+/compile_commands.json
