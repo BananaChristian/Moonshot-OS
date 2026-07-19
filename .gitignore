@@ -1,0 +1,9 @@
+# Ignore Cargo build directories
+target/
+**/target/
+
+# Ignore binaries and object files
+*.o
+*.bin
+os_image.bin
+**/bin/
