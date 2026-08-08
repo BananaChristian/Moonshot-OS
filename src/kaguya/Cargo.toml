@@ -3,10 +3,10 @@ name = "kaguya"
 version = "0.1.0"
 edition = "2024"
 
-[profile.dev]
-panic = "abort"
-
-[profile.release]
-panic = "abort"
-
 [dependencies]
+bootloader="0.9"
+x86_64="0.14"
+spin = "0.9"
+
+[package.metadata.bootimage]
+run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]

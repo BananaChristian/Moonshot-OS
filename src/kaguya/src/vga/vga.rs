@@ -1,4 +1,10 @@
-use core::ptr::{read_volatile, write_volatile};
+use core::{
+    fmt::{self, Write},
+    ptr::{read_volatile, write_volatile},
+};
+
+use spin::Mutex;
+use x86_64::instructions::interrupts::without_interrupts;
 
 #[allow(dead_code)]
 #[repr(C)]
@@ -22,6 +28,7 @@ pub enum Color {
 }
 
 //This is the combination of what sits in a grid
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub struct ScreenChar {
     ascii_character: u8,
@@ -35,8 +42,18 @@ pub struct VGA {
     buffer: *mut ScreenChar,
 }
 
+impl Write for VGA {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
+}
+
+unsafe impl Send for VGA {}
+unsafe impl Sync for VGA {}
+
 impl VGA {
-    pub fn new(foreground: Color, background: Color) -> Self {
+    const fn new(foreground: Color, background: Color) -> Self {
         VGA {
             width: 80,
             cursor: 0, //Start at 0
@@ -76,6 +93,7 @@ impl VGA {
             );
         }
         self.cursor += 1;
+        self.check_scroll();
     }
 
     pub fn write_string(&mut self, s: &str) {
@@ -110,4 +128,24 @@ impl VGA {
 
         self.cursor = 1920;
     }
+}
+
+pub static VGA_WRITER: Mutex<VGA> = Mutex::new(VGA::new(Color::LightCyan, Color::Black));
+
+#[doc(hidden)]
+pub fn _print(args: fmt::Arguments) {
+    without_interrupts(|| {
+        VGA_WRITER.lock().write_fmt(args).unwrap();
+    });
+}
+
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::vga::_print(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
 }

@@ -6,4 +6,3 @@ runner = "bootimage runner"
 rustflags = [
     "-C", "relocation-model=static",
 ]
-

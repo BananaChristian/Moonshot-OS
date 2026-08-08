@@ -1,0 +1,11 @@
+[workspace]
+members=[
+  "src/kaguya"
+]
+resolver="2"
+
+[profile.dev]
+panic="abort"
+
+[profile.release]
+panic="abort"
