@@ -2,11 +2,12 @@
 #![no_std]
 #![no_main]
 
-use bootloader::{entry_point, BootInfo};
+use bootloader::{BootInfo, entry_point};
 use core::panic::PanicInfo;
 
 use crate::interrupts::initialize_interrupts;
 
+mod gdt;
 mod interrupts;
 mod vga;
 
@@ -18,6 +19,9 @@ fn kmain(_boot_info: &'static BootInfo) -> ! {
 
     println!("[OK] Kaguya core initialized.");
     println!("[OK] VGA text mode initialized.");
+
+    gdt::init();
+    println!("[OK] GDT & TSS initialized (Double Fault IST active).");
 
     // Initialize IDT and hardware interrupts
     initialize_interrupts();

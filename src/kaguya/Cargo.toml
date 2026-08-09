@@ -7,6 +7,7 @@ edition = "2024"
 bootloader="0.9"
 x86_64="0.14"
 spin = "0.9"
+pc-keyboard = "0.7.0"
 
 [package.metadata.bootimage]
 run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]

@@ -83,6 +83,23 @@ impl VGA {
             return;
         }
 
+        // Handle Backspace (0x08)
+        if char == 0x08 {
+            if self.cursor > 0 {
+                self.cursor -= 1;
+                unsafe {
+                    write_volatile(
+                        self.buffer.offset(self.cursor as isize),
+                        ScreenChar {
+                            ascii_character: b' ',
+                            color_code: self.color_code,
+                        },
+                    );
+                }
+            }
+            return;
+        }
+
         unsafe {
             write_volatile(
                 self.buffer.offset(self.cursor as isize),
